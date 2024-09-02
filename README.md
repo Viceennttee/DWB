@@ -27,5 +27,5 @@ El objetivo de este proyecto es desarrollar un sistema multi-robot donde los rob
 1. **Clonar el repositorio:**
 
    ```bash
-   git clone https://github.com/tu-usuario/tu-repositorio.git
-   cd tu-repositorio
+   git clone https://github.com/Viceennttee/DWB.git
+   cd DWB
