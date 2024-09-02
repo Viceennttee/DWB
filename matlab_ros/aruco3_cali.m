@@ -1,0 +1,59 @@
+cam = webcam(2);
+%preview(cam);
+
+% Cargar los parámetros de la cámara desde el archivo de calibración
+load('cameraParams.mat', 'params');
+
+%publicador de la posición de arUco
+
+matlab = ros2node("/matlab");
+ArucoCenterPub = ros2publisher(matlab,"/aruco_center", "geometry_msgs/Vector3");
+chatterMSG = ros2message("geometry_msgs/Vector3");
+
+
+while(1)
+    %pause(0.5)
+    I = snapshot(cam);
+    %I = imread("/home/vicente/Downloads/aruco4.png");
+    [ids,locs,detectedFamily] = readArucoMarker(I);
+    numMarkers = length(ids);
+    if numMarkers>0 & detectedFamily(1) == "DICT_5X5_1000"
+        chatterMSG.z = 1;
+        %disp(detectedFamily(1))
+    else
+        chatterMSG.z = 0;
+    end
+    for i = 1:numMarkers
+      loc = locs(:,:,i);
+      
+       
+      % Display the marker ID and family
+      %disp("Detected marker ID, Family: " + ids(i) + ", " + detectedFamily(i))  
+     
+      % Insert marker edges
+      I = insertShape(I,"polygon",{loc},Opacity=1,ShapeColor="green",LineWidth=4);
+     
+      % Insert marker corners
+      markerRadius = 6;
+      numCorners = size(loc,1);
+      markerPosition = [loc,repmat(markerRadius,numCorners,1)];
+      I = insertShape(I,"FilledCircle",markerPosition,ShapeColor="red",Opacity=1);
+       
+      % Insert marker IDs
+      center = mean(loc);
+      % Convertir puntos de imagen a puntos del mundo real
+      
+      I = insertText(I,center,ids(i),FontSize=30,BoxOpacity=1);
+
+    end
+    
+    imshow(I)
+
+
+    chatterMSG.x = center(1);
+    chatterMSG.y = center(2);
+
+    send(ArucoCenterPub,chatterMSG)
+    
+
+end
