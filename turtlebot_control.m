@@ -16,8 +16,8 @@ tf = 50; %%Tiempo de simulación
 
 %% Referencia a los puntos objetivo
 %%Coordenadas del objetivo 1
-xd = 4
-yd = 2
+xd = 1
+yd = 1
 
 
 %% Variables de Control
@@ -55,10 +55,14 @@ tic %%Usando la configuración de tiempo real en Coppelia, se usa el tiempo real
 %% Conexión a ROS
 testnode = ros2node("/nodo_consenso");
 testpub = ros2publisher(testnode,"/cmd_vel","geometry_msgs/Twist");
+testpub2 = ros2publisher(testnode,"/tb3_1/cmd_vel","geometry_msgs/Twist");
 chatterMSG = ros2message("geometry_msgs/Twist")
 chatterMSG.linear.x = 0.0; 
 chatterMSG.angular.z = 0.0; 
-send(testpub,chatterMSG)
+chatterMSG2 = ros2message("geometry_msgs/Twist")
+chatterMSG2.linear.x = 0.0; 
+chatterMSG2.angular.z = 0.0; 
+send(testpub2,chatterMSG2)
 
 
 while t < tf
@@ -231,6 +235,9 @@ while t < tf
     chatterMSG.linear.x = V2; 
     chatterMSG.angular.z = w2; 
     send(testpub,chatterMSG)
+    chatterMSG2.linear.x = V3; 
+    chatterMSG2.angular.z = w3; 
+    send(testpub2,chatterMSG2)
 
     figure(1)
     scatter(x1,y1,'color','blue','LineWidth',2);
@@ -248,6 +255,9 @@ end
 chatterMSG.linear.x = 0.0; 
 chatterMSG.angular.z = 0.0; 
 send(testpub,chatterMSG)
+chatterMSG2.linear.x = 0.0; 
+chatterMSG2.angular.z = 0.0; 
+send(testpub2,chatterMSG2)
 
 figure(2)
 plot(Thetae)
